@@ -71,10 +71,9 @@
 <body>
   <header>
     <div class="nav-wrap">
-      <a href="#" class="logo"><span>⚡</span> NK VERIF LABS</a>
+      <a href="#" class="logo"><svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><rect x="4" y="4" width="20" height="20" rx="4" stroke="#3b82f6" stroke-width="2" fill="rgba(59,130,246,0.12)"/><path d="M9 1v3M14 1v3M19 1v3M9 24v3M14 24v3M19 24v3M1 9h3M1 14h3M1 19h3M24 9h3M24 14h3M24 19h3" stroke="#10b981" stroke-width="1.6" stroke-linecap="round"/><path d="M9.5 18V10l5 8V10M17.5 10v8M21 10l-3.5 4 3.5 4" stroke="#f8fafc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>NK VERIF LABS</a>
       <div class="nav-links">
         <a href="#services">Services</a>
-        <a href="#pricing">Audit Tiers</a>
         <a href="#portfolio">Silicon Proof</a>
         <a href="https://www.linkedin.com/in/nk-veriflabs" target="_blank" class="btn">Connect on LinkedIn</a>
       </div>
@@ -83,8 +82,7 @@
   <main>
     <section class="hero">
       <div class="pill-row">
-        <span class="badge">OPEN-SOURCE SILICON &amp; ASIC CONSULTING</span>
-        <span class="badge badge-live"><span class="dot"></span><span id="shuttle-pill">CI2612 Cutoff: Dec 7, 2026</span></span>
+        <span class="badge">OPEN-SOURCE SILICON &amp; ASIC CONSULTING</span><span id="shuttle-pill">CI2612 Cutoff: Dec 7, 2026</span></span>
       </div>
       <h1>Turnkey RTL-to-GDSII Hardening &amp; Cocotb Verification</h1>
       <p>Physical implementation, multi-corner STA closure, 13/13 precheck sign-off, and portable Cocotb/Verilator testbenches for SkyWater 130nm, IHP SG13G2, and open MPW shuttles.</p>
@@ -112,7 +110,7 @@
         </div>
         <div class="card">
           <h3>Pre-Shuttle Audit &amp; Sign-Off</h3>
-          <p>Multi-corner STA, Magic/KLayout DRC, CVC OEB checks, and Netgen LVS verification before your ChipFoundry (CI2612) or Europractice shuttle cutoff.</p>
+          <p>Multi-corner STA, Magic/KLayout DRC, CVC OEB checks, and Netgen LVS verification before your open MPW or Europractice shuttle cutoff.</p>
           <div class="tag-list"><span class="tag">Multi-Corner STA</span><span class="tag">0 DRC</span><span class="tag">Clean LVS</span><span class="tag">CVC OEB</span></div>
         </div>
         <div class="card">
@@ -124,52 +122,6 @@
           <h3>Automated CI/CD ASIC Pipelines</h3>
           <p>Turnkey GitHub Actions and Nix flows running RTL/gate-level Cocotb simulations, synthesis, and cf-precheck v1.3.7 on every push.</p>
           <div class="tag-list"><span class="tag">GitHub Actions</span><span class="tag">Nix</span><span class="tag">cf-precheck v1.3.7</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pricing" class="section">
-      <h2 class="section-title">Fixed-Scope Audit &amp; Hardening Packages</h2>
-      <p class="section-desc">Fast turnaround with transparent milestones—no surprise retainers.</p>
-      <div class="grid-3">
-        <div class="price-card">
-          <div>
-            <div class="price-tier">Starter · 2 Days</div>
-            <div class="price-val">$250</div>
-            <div class="price-sub">Pre-Shuttle DRC &amp; LVS Audit</div>
-            <ul class="price-list">
-              <li>Full cf-precheck / KLayout DRC &amp; Netgen LVS triage</li>
-              <li>Caravel user_defines.v &amp; CVC OEB check</li>
-              <li>Actionable fix list + 1 revision</li>
-            </ul>
-          </div>
-          <a href="mailto:nkveriflabs@gmail.com?subject=Starter%20Pre-Shuttle%20Audit%20(%24250)" class="btn btn-outline">Book Starter Audit</a>
-        </div>
-        <div class="price-card featured">
-          <div>
-            <div class="price-tier">Standard · 3 Days</div>
-            <div class="price-val">$450</div>
-            <div class="price-sub">Full Sign-Off &amp; OEB Closure</div>
-            <ul class="price-list">
-              <li>Everything in Starter + patch implementation</li>
-              <li>Multi-corner STA &amp; OpenRAM LVS blackboxing</li>
-              <li>13/13 precheck sign-off + 2 revisions</li>
-            </ul>
-          </div>
-          <a href="mailto:nkveriflabs@gmail.com?subject=Standard%20Sign-Off%20Package%20(%24450)" class="btn">Book Standard Sign-Off</a>
-        </div>
-        <div class="price-card">
-          <div>
-            <div class="price-tier">Advanced · 5 Days</div>
-            <div class="price-val">$850</div>
-            <div class="price-sub">RTL-to-GDSII Macro Hardening</div>
-            <ul class="price-list">
-              <li>Full OpenLane / LibreLane macro implementation</li>
-              <li>Cocotb RTL + Gate-Level verification suite</li>
-              <li>GitHub Actions CI + 3 revisions</li>
-            </ul>
-          </div>
-          <a href="mailto:nkveriflabs@gmail.com?subject=Advanced%20Macro%20Hardening%20(%24850)" class="btn btn-outline">Book Macro Hardening</a>
         </div>
       </div>
     </section>
@@ -194,9 +146,5 @@
     <p><strong>NK Verif Labs</strong> &bull; Physical Design &amp; Functional Verification Consulting</p>
     <p style="margin-top:.5rem">Lead Consultant: <strong>Niranjankumar Katragadda</strong> &bull; <a href="mailto:nkveriflabs@gmail.com" class="repo-link">nkveriflabs@gmail.com</a> &bull; <a href="https://www.linkedin.com/in/nk-veriflabs" target="_blank" class="repo-link">LinkedIn</a></p>
   </footer>
-  <script>
-    const d = Math.max(0, Math.ceil((new Date('2026-12-07T23:59:59Z') - Date.now()) / 86400000));
-    document.getElementById('shuttle-pill').textContent = `CI2612 Cutoff: Dec 7 (${d}d left)`;
-  </script>
 </body>
 </html>

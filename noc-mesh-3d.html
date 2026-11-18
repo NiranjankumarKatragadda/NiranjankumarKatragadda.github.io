@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D NoC Mesh &amp; Systolic Packet Visualizer — NK Verif Labs</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #070b14;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    #viewport { touch-action: none; }
+    input[type="range"] { accent-color: #22d3ee; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#070b14] text-slate-200">
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-[#0b1120]/90 backdrop-blur px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-slate-950 font-bold text-xs mono shadow-lg shadow-cyan-500/20">
+        NoC
+      </div>
+      <div>
+        <h1 class="text-sm sm:text-base font-semibold tracking-tight text-white">3D NoC Mesh &amp; AXI4-Stream Packet Visualizer</h1>
+        <p class="text-xs text-slate-400">4×4 XY-Routing Tile Grid · Registered Skid Buffers · NK Verif Labs</p>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button id="btnPlayPause" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition cursor-pointer">
+        Pause
+      </button>
+      <button id="btnStep" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer">
+        Step +1 Cycle
+      </button>
+      <button id="btnBurst" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 transition cursor-pointer">
+        Inject Burst
+      </button>
+      <button id="btnClearStalls" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+        Clear Stalls
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 p-3 max-w-[1600px] w-full mx-auto">
+    <!-- 3D Canvas Panel -->
+    <section class="lg:col-span-8 flex flex-col rounded-xl border border-slate-800 bg-[#0b1120] overflow-hidden relative min-h-[380px] sm:min-h-[500px]">
+      <!-- Top Overlay Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-slate-800/80 bg-slate-900/60 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400">Click Node:</span>
+          <button id="modeInject" class="px-2.5 py-1 rounded-md font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 cursor-pointer">
+            Inject Packet
+          </button>
+          <button id="modeStall" class="px-2.5 py-1 rounded-md font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 cursor-pointer">
+            Toggle Stall
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button id="camIso" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">Iso</button>
+          <button id="camTop" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">Top</button>
+          <button id="camReset" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">Reset</button>
+        </div>
+      </div>
+
+      <!-- Three.js Container -->
+      <div id="viewport" class="relative flex-1 w-full h-full min-h-[340px]">
+        <div id="statusBadge" class="pointer-events-none absolute bottom-3 left-3 px-2.5 py-1.5 rounded-lg bg-slate-950/85 border border-slate-800 text-[11px] text-slate-300 mono">
+          Drag to orbit · Scroll to zoom · Click any router tile
+        </div>
+        <div id="srcHint" class="hidden pointer-events-none absolute top-3 left-3 px-2.5 py-1.5 rounded-lg bg-cyan-950/90 border border-cyan-500/50 text-xs text-cyan-200 mono">
+          Source selected: <span id="srcLabel">-</span> — click destination tile
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="px-3 py-2 border-t border-slate-800/80 bg-slate-900/50 flex flex-wrap items-center gap-4 text-[11px] text-slate-400">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span> Active XY Flit</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Skid Buffer Pillar (Load)</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Backpressure Stall</span>
+      </div>
+    </section>
+
+    <!-- Controls & Telemetry Sidebar -->
+    <aside class="lg:col-span-4 flex flex-col gap-3">
+      <!-- Live Telemetry Cards -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="rounded-xl border border-slate-800 bg-[#0b1120] p-3">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider">Cycle</div>
+          <div id="statCycle" class="text-xl font-bold text-white mono mt-0.5">0</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-[#0b1120] p-3">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider">In-Flight Flits</div>
+          <div id="statInFlight" class="text-xl font-bold text-cyan-400 mono mt-0.5">0</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-[#0b1120] p-3">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider">Delivered</div>
+          <div id="statDelivered" class="text-xl font-bold text-emerald-400 mono mt-0.5">0</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-[#0b1120] p-3">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider">Avg Latency</div>
+          <div id="statLatency" class="text-xl font-bold text-amber-300 mono mt-0.5">0.0 cyc</div>
+        </div>
+      </div>
+
+      <!-- Traffic & Parameters -->
+      <div class="rounded-xl border border-slate-800 bg-[#0b1120] p-4 flex flex-col gap-3.5">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300">Traffic &amp; Arbitration</h2>
+
+        <div>
+          <label for="trafficPattern" class="block text-xs text-slate-400 mb-1">Traffic Pattern</label>
+          <select id="trafficPattern" class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400">
+            <option value="uniform">Uniform Random (XY)</option>
+            <option value="systolic">Systolic Diagonal Wave</option>
+            <option value="hotspot">Hotspot Congestion → R(3,3)</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-400">Injection Rate</span>
+            <span id="injVal" class="mono text-cyan-300">45%</span>
+          </div>
+          <input id="injRate" type="range" min="10" max="100" value="45" class="w-full cursor-pointer" />
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-400">Simulation Speed</span>
+            <span id="spdVal" class="mono text-emerald-300">1.0x</span>
+          </div>
+          <input id="simSpeed" type="range" min="5" max="30" value="10" class="w-full cursor-pointer" />
+        </div>
+      </div>
+
+      <!-- Packet & Router Log -->
+      <div class="rounded-xl border border-slate-800 bg-[#0b1120] p-4 flex-1 flex flex-col min-h-[180px]">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-300">XY-Route &amp; Skid Buffer Log</h2>
+          <span id="stalledCount" class="text-[11px] mono text-rose-400">0 stalled</span>
+        </div>
+        <div id="eventLog" class="flex-1 overflow-y-auto space-y-1.5 text-[11px] mono text-slate-300 max-h-[210px] pr-1"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    (function () {
+      const GRID = 4;
+      const SPACING = 3.2;
+      const OFFSET = ((GRID - 1) * SPACING) / 2;
+
+      const viewport = document.getElementById("viewport");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b14);
+      scene.fog = new THREE.FogExp2(0x070b14, 0.025);
+
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      viewport.appendChild(renderer.domElement);
+
+      // Lighting
+      scene.add(new THREE.AmbientLight(0x94a3b8, 0.8));
+      const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.1);
+      dirLight.position.set(10, 18, 12);
+      scene.add(dirLight);
+      const greenLight = new THREE.PointLight(0x22c55e, 0.9, 30);
+      greenLight.position.set(-8, 6, -8);
+      scene.add(greenLight);
+
+      // Silicon Substrate Base
+      const dieGeo = new THREE.BoxGeometry(GRID * SPACING + 1.8, 0.35, GRID * SPACING + 1.8);
+      const dieMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5, metalness: 0.4 });
+      const dieMesh = new THREE.Mesh(dieGeo, dieMat);
+      dieMesh.position.y = -0.35;
+      scene.add(dieMesh);
+
+      const gridHelper = new THREE.GridHelper(GRID * SPACING + 1.6, 16, 0x1e293b, 0x0f172a);
+      gridHelper.position.y = -0.17;
+      scene.add(gridHelper);
+
+      // Router Nodes & Skid Buffer Pillars
+      const routers = [];
+      const routerMeshes = [];
+      const linkLines = [];
+
+      function nodePos(x, y) {
+        return new THREE.Vector3(x * SPACING - OFFSET, 0.25, y * SPACING - OFFSET);
+      }
+
+      for (let y = 0; y < GRID; y++) {
+        for (let x = 0; x < GRID; x++) {
+          const pos = nodePos(x, y);
+          const baseGeo = new THREE.BoxGeometry(1.35, 0.4, 1.35);
+          const baseMat = new THREE.MeshStandardMaterial({
+            color: 0x1e293b,
+            emissive: 0x082f49,
+            emissiveIntensity: 0.4,
+            roughness: 0.35,
+            metalness: 0.6
+          });
+          const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+          baseMesh.position.copy(pos);
+          baseMesh.userData = { x, y };
+          scene.add(baseMesh);
+          routerMeshes.push(baseMesh);
+
+          // Skid buffer utilization pillar
+          const pilGeo = new THREE.BoxGeometry(0.45, 1.0, 0.45);
+          const pilMat = new THREE.MeshStandardMaterial({
+            color: 0x22c55e,
+            emissive: 0x10b981,
+            emissiveIntensity: 0.5,
+            roughness: 0.25
+          });
+          const pilMesh = new THREE.Mesh(pilGeo, pilMat);
+          pilMesh.position.set(pos.x, 0.5, pos.z);
+          pilMesh.scale.y = 0.15;
+          scene.add(pilMesh);
+
+          routers.push({
+            x, y,
+            id: `R(${x},${y})`,
+            pos,
+            baseMesh,
+            pilMesh,
+            stalled: false,
+            load: 0
+          });
+        }
+      }
+
+      // Interconnect Links
+      const linkMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f, transparent: true, opacity: 0.85 });
+      for (let y = 0; y < GRID; y++) {
+        for (let x = 0; x < GRID; x++) {
+          const p0 = nodePos(x, y);
+          if (x + 1 < GRID) {
+            const g = new THREE.BufferGeometry().setFromPoints([p0, nodePos(x + 1, y)]);
+            const l = new THREE.Line(g, linkMat);
+            scene.add(l);
+            linkLines.push(l);
+          }
+          if (y + 1 < GRID) {
+            const g = new THREE.BufferGeometry().setFromPoints([p0, nodePos(x, y + 1)]);
+            const l = new THREE.Line(g, linkMat);
+            scene.add(l);
+            linkLines.push(l);
+          }
+        }
+      }
+
+      function getRouter(x, y) {
+        return routers[y * GRID + x];
+      }
+
+      // Camera Orbit State
+      let theta = Math.PI / 4;
+      let phi = 0.95;
+      let radius = 16.5;
+
+      function updateCamera() {
+        camera.position.x = radius * Math.sin(phi) * Math.cos(theta);
+        camera.position.y = radius * Math.cos(phi);
+        camera.position.z = radius * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(0, 0.3, 0);
+      }
+      updateCamera();
+
+      // Resize Handling
+      function handleResize() {
+        const w = viewport.clientWidth || 600;
+        const h = viewport.clientHeight || 400;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      window.addEventListener("resize", handleResize);
+      handleResize();
+
+      // Simulation State
+      let running = true;
+      let cycle = 0;
+      let delivered = 0;
+      let totalLatency = 0;
+      let packets = [];
+      let nextPktId = 1;
+      let clickMode = "inject"; // 'inject' | 'stall'
+      let selectedSrc = null;
+      let injectionRate = 45;
+      let simSpeed = 1.0;
+      let hopAccum = 0;
+
+      const flitGeo = new THREE.SphereGeometry(0.22, 16, 16);
+
+      function logEvent(msg, tone) {
+        const logEl = document.getElementById("eventLog");
+        const row = document.createElement("div");
+        const color = tone === "stall" ? "text-rose-400" : tone === "done" ? "text-emerald-400" : "text-cyan-300";
+        row.className = `${color} truncate`;
+        row.textContent = `[C${cycle}] ${msg}`;
+        logEl.prepend(row);
+        while (logEl.children.length > 28) logEl.removeChild(logEl.lastChild);
+      }
+
+      function spawnPacket(sx, sy, dx, dy) {
+        if (sx === dx && sy === dy) return;
+        const mat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+        const mesh = new THREE.Mesh(flitGeo, mat);
+        const startPos = nodePos(sx, sy);
+        mesh.position.set(startPos.x, 0.65, startPos.z);
+        scene.add(mesh);
+
+        packets.push({
+          id: nextPktId++,
+          cx: sx, cy: sy,
+          nx: sx, ny: sy,
+          dx, dy,
+          birth: cycle,
+          progress: 1.0,
+          stalled: false,
+          mesh
+        });
+      }
+
+      function autoTraffic() {
+        const pattern = document.getElementById("trafficPattern").value;
+        if (Math.random() * 100 > injectionRate) return;
+        if (packets.length > 36) return;
+
+        if (pattern === "uniform") {
+          const sx = Math.floor(Math.random() * GRID);
+          const sy = Math.floor(Math.random() * GRID);
+          const dx = Math.floor(Math.random() * GRID);
+          const dy = Math.floor(Math.random() * GRID);
+          spawnPacket(sx, sy, dx, dy);
+        } else if (pattern === "systolic") {
+          const row = cycle % GRID;
+          spawnPacket(0, row, GRID - 1, row);
+        } else {
+          const sx = Math.floor(Math.random() * GRID);
+          const sy = Math.floor(Math.random() * GRID);
+          spawnPacket(sx, sy, GRID - 1, GRID - 1);
+        }
+      }
+
+      function stepCycle() {
+        cycle++;
+        autoTraffic();
+
+        // Reset router loads
+        for (const r of routers) r.load = 0;
+
+        const remaining = [];
+        for (const p of packets) {
+          if (p.progress >= 1.0) {
+            p.cx = p.nx;
+            p.cy = p.ny;
+            if (p.cx === p.dx && p.cy === p.dy) {
+              delivered++;
+              totalLatency += Math.max(1, cycle - p.birth);
+              scene.remove(p.mesh);
+              p.mesh.geometry = null;
+              p.mesh.material.dispose();
+              if (delivered % 3 === 0 || packets.length < 6) {
+                logEvent(`P#${p.id} delivered → R(${p.dx},${p.dy})`, "done");
+              }
+              continue;
+            }
+            // XY dimension-order routing
+            let tx = p.cx;
+            let ty = p.cy;
+            if (p.cx !== p.dx) tx += p.dx > p.cx ? 1 : -1;
+            else if (p.cy !== p.dy) ty += p.dy > p.cy ? 1 : -1;
+
+            const nextR = getRouter(tx, ty);
+            if (nextR.stalled) {
+              p.stalled = true;
+              p.mesh.material.color.setHex(0xf43f5e);
+              getRouter(p.cx, p.cy).load += 1;
+            } else {
+              p.stalled = false;
+              p.mesh.material.color.setHex(0x22d3ee);
+              p.nx = tx;
+              p.ny = ty;
+              p.progress = 0.0;
+              nextR.load += 1;
+            }
+          } else {
+            getRouter(p.nx, p.ny).load += 1;
+          }
+          remaining.push(p);
+        }
+        packets = remaining;
+
+        // Update router visuals
+        let stalledCount = 0;
+        for (const r of routers) {
+          if (r.stalled) stalledCount++;
+          const targetScale = r.stalled ? 1.5 : Math.min(2.4, 0.2 + r.load * 0.45);
+          r.pilMesh.scale.y += (targetScale - r.pilMesh.scale.y) * 0.45;
+          r.pilMesh.position.y = 0.45 + (r.pilMesh.scale.y * 0.5) - 0.1;
+
+          if (r.stalled) {
+            r.pilMesh.material.color.setHex(0xf43f5e);
+            r.pilMesh.material.emissive.setHex(0xe11d48);
+          } else if (r.load >= 2) {
+            r.pilMesh.material.color.setHex(0xf59e0b);
+            r.pilMesh.material.emissive.setHex(0xd97706);
+          } else {
+            r.pilMesh.material.color.setHex(0x22c55e);
+            r.pilMesh.material.emissive.setHex(0x10b981);
+          }
+        }
+
+        // Update HUD
+        document.getElementById("statCycle").textContent = String(cycle);
+        document.getElementById("statInFlight").textContent = String(packets.length);
+        document.getElementById("statDelivered").textContent = String(delivered);
+        const avg = delivered > 0 ? (totalLatency / delivered).toFixed(1) : "0.0";
+        document.getElementById("statLatency").textContent = `${avg} cyc`;
+        document.getElementById("stalledCount").textContent = `${stalledCount} stalled`;
+      }
+
+      // Animation Loop
+      let lastTime = performance.now();
+      function animate(now) {
+        requestAnimationFrame(animate);
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        if (running) {
+          hopAccum += dt * simSpeed * 2.2;
+          while (hopAccum >= 1.0) {
+            stepCycle();
+            hopAccum -= 1.0;
+          }
+        }
+
+        // Interpolate packet flits along links
+        for (const p of packets) {
+          if (!p.stalled && p.progress < 1.0) {
+            p.progress = Math.min(1.0, p.progress + dt * simSpeed * 2.2);
+          }
+          const a = nodePos(p.cx, p.cy);
+          const b = nodePos(p.nx, p.ny);
+          p.mesh.position.x = a.x + (b.x - a.x) * p.progress;
+          p.mesh.position.z = a.z + (b.z - a.z) * p.progress;
+          p.mesh.position.y = 0.65 + Math.sin(p.progress * Math.PI) * 0.35;
+        }
+
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+
+      // Pointer Orbit + Raycasting Click
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let dragging = false;
+      let moved = false;
+      let prevX = 0, prevY = 0;
+
+      viewport.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        moved = false;
+        prevX = e.clientX;
+        prevY = e.clientY;
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - prevX;
+        const dy = e.clientY - prevY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+        theta -= dx * 0.008;
+        phi = Math.max(0.2, Math.min(1.42, phi - dy * 0.008));
+        prevX = e.clientX;
+        prevY = e.clientY;
+        updateCamera();
+      });
+
+      window.addEventListener("pointerup", (e) => {
+        if (!dragging) return;
+        dragging = false;
+        if (moved) return;
+
+        const rect = renderer.domElement.getBoundingClientRect();
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(routerMeshes);
+        if (hits.length === 0) return;
+
+        const { x, y } = hits[0].object.userData;
+        const r = getRouter(x, y);
+
+        if (clickMode === "stall") {
+          r.stalled = !r.stalled;
+          r.baseMesh.material.emissive.setHex(r.stalled ? 0x9f1239 : 0x082f49);
+          logEvent(`${r.id} ${r.stalled ? "STALLED (backpressure)" : "RESUMED"}`, "stall");
+        } else {
+          if (!selectedSrc) {
+            selectedSrc = { x, y };
+            r.baseMesh.material.emissive.setHex(0x0e7490);
+            document.getElementById("srcHint").classList.remove("hidden");
+            document.getElementById("srcLabel").textContent = r.id;
+          } else {
+            const srcR = getRouter(selectedSrc.x, selectedSrc.y);
+            srcR.baseMesh.material.emissive.setHex(srcR.stalled ? 0x9f1239 : 0x082f49);
+            if (selectedSrc.x !== x || selectedSrc.y !== y) {
+              spawnPacket(selectedSrc.x, selectedSrc.y, x, y);
+              logEvent(`Injected ${srcR.id} → ${r.id}`, "info");
+            }
+            selectedSrc = null;
+            document.getElementById("srcHint").classList.add("hidden");
+          }
+        }
+      });
+
+      viewport.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        radius = Math.max(8, Math.min(28, radius + e.deltaY * 0.01));
+        updateCamera();
+      }, { passive: false });
+
+      // UI Controls
+      document.getElementById("btnPlayPause").addEventListener("click", () => {
+        running = !running;
+        document.getElementById("btnPlayPause").textContent = running ? "Pause" : "Resume";
+      });
+
+      document.getElementById("btnStep").addEventListener("click", () => {
+        running = false;
+        document.getElementById("btnPlayPause").textContent = "Resume";
+        stepCycle();
+      });
+
+      document.getElementById("btnBurst").addEventListener("click", () => {
+        for (let i = 0; i < 6; i++) {
+          spawnPacket(0, i % GRID, GRID - 1, (i + 2) % GRID);
+        }
+        logEvent("Injected 6-packet diagonal burst", "info");
+      });
+
+      document.getElementById("btnClearStalls").addEventListener("click", () => {
+        for (const r of routers) {
+          r.stalled = false;
+          r.baseMesh.material.emissive.setHex(0x082f49);
+        }
+        logEvent("Cleared all router backpressure stalls", "done");
+      });
+
+      function setClickMode(mode) {
+        clickMode = mode;
+        selectedSrc = null;
+        document.getElementById("srcHint").classList.add("hidden");
+        const mInj = document.getElementById("modeInject");
+        const mStl = document.getElementById("modeStall");
+        if (mode === "inject") {
+          mInj.className = "px-2.5 py-1 rounded-md font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 cursor-pointer";
+          mStl.className = "px-2.5 py-1 rounded-md font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 cursor-pointer";
+        } else {
+          mStl.className = "px-2.5 py-1 rounded-md font-medium bg-rose-500/20 text-rose-300 border border-rose-500/50 cursor-pointer";
+          mInj.className = "px-2.5 py-1 rounded-md font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 cursor-pointer";
+        }
+      }
+      document.getElementById("modeInject").addEventListener("click", () => setClickMode("inject"));
+      document.getElementById("modeStall").addEventListener("click", () => setClickMode("stall"));
+
+      document.getElementById("camIso").addEventListener("click", () => { theta = Math.PI / 4; phi = 0.95; radius = 16.5; updateCamera(); });
+      document.getElementById("camTop").addEventListener("click", () => { theta = Math.PI / 2; phi = 0.15; radius = 16.5; updateCamera(); });
+      document.getElementById("camReset").addEventListener("click", () => { theta = Math.PI / 4; phi = 0.95; radius = 16.5; updateCamera(); });
+
+      document.getElementById("injRate").addEventListener("input", (e) => {
+        injectionRate = Number(e.target.value);
+        document.getElementById("injVal").textContent = `${injectionRate}%`;
+      });
+
+      document.getElementById("simSpeed").addEventListener("input", (e) => {
+        simSpeed = Number(e.target.value) / 10;
+        document.getElementById("spdVal").textContent = `${simSpeed.toFixed(1)}x`;
+      });
+
+      // Initial seed packets
+      spawnPacket(0, 0, 3, 2);
+      spawnPacket(1, 3, 3, 0);
+      logEvent("NoC 4x4 mesh initialized (XY dimension-order)", "info");
+    })();
+  </script>
+</body>
+</html>

@@ -1,154 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NK Verif Labs | RTL-to-GDSII Hardening &amp; Verification</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NK Verif Labs — Niranjankumar Katragadda | 3D Silicon &amp; Verification Portfolio</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root { --bg:#070b14; --surface:rgba(17,24,39,.78); --border:rgba(148,163,184,.14); --accent:#3b82f6; --accent2:#10b981; --text:#f8fafc; --muted:#94a3b8; }
-    *{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth}
-    body{background:radial-gradient(circle at 50% -10%,rgba(59,130,246,.18),transparent 45%),radial-gradient(circle at 85% 30%,rgba(16,185,129,.08),transparent 35%),linear-gradient(rgba(148,163,184,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.04) 1px,transparent 1px),var(--bg);background-size:100% 100%,100% 100%,42px 42px,42px 42px,100% 100%;color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.6}
-    header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(7,11,20,.78);border-bottom:1px solid var(--border)}
-    .nav-wrap{max-width:1160px;margin:0 auto;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center}
-    .logo{font-family:'Fira Code',monospace;font-weight:700;font-size:1.1rem;color:#fff;text-decoration:none;letter-spacing:.02em}
-    .logo span{color:var(--accent)}
-    .nav-links{display:flex;align-items:center;gap:1.5rem}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:500;transition:color .2s}
-    .nav-links a:hover{color:#fff}
-    .btn{display:inline-flex;align-items:center;gap:.4rem;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;padding:.65rem 1.25rem;border-radius:8px;font-weight:600;text-decoration:none;font-size:.92rem;box-shadow:0 4px 20px rgba(37,99,235,.32);transition:all .2s}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(59,130,246,.45)}
-    .btn-outline{background:rgba(15,23,42,.65);border:1px solid var(--border);color:var(--text);box-shadow:none}
-    .btn-outline:hover{border-color:var(--accent);background:rgba(30,41,59,.85);box-shadow:none}
-    .hero{max-width:960px;margin:4.5rem auto 2.5rem;padding:0 1.5rem;text-align:center}
-    .pill-row{display:flex;justify-content:center;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem}
-    .badge{display:inline-flex;align-items:center;gap:.45rem;padding:.38rem .9rem;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.32);border-radius:999px;color:#93c5fd;font-size:.8rem;font-family:'Fira Code',monospace}
-    .badge-live{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.35);color:#6ee7b7}
-    .dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);box-shadow:0 0 8px var(--accent2)}
-    .hero h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin-bottom:1.25rem;background:linear-gradient(180deg,#fff 35%,#94a3b8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .hero p{font-size:1.12rem;color:var(--muted);max-width:700px;margin:0 auto 2rem}
-    .cta-row{display:flex;justify-content:center;flex-wrap:wrap;gap:.9rem}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:1060px;margin:3.5rem auto;padding:0 1.5rem}
-    .stat-card,.card,.price-card,.table-container{background:var(--surface);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:12px}
-    .stat-card{padding:1.4rem 1rem;text-align:center;transition:border-color .2s,transform .2s}
-    .stat-card:hover{border-color:rgba(59,130,246,.45);transform:translateY(-2px)}
-    .stat-val{font-size:1.75rem;font-weight:700;color:#fff;font-family:'Fira Code',monospace}
-    .stat-lbl{font-size:.82rem;color:var(--muted);margin-top:.3rem}
-    .section{max-width:1160px;margin:5.5rem auto;padding:0 1.5rem}
-    .section-title{font-size:2rem;font-weight:700;letter-spacing:-.02em;text-align:center;margin-bottom:.5rem}
-    .section-desc{text-align:center;color:var(--muted);max-width:650px;margin:0 auto 2.75rem;font-size:1rem}
-    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}
-    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem}
-    .card{padding:1.85rem;transition:all .25s;position:relative;overflow:hidden}
-    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.45}
-    .card:hover{border-color:rgba(59,130,246,.5);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
-    .card h3{font-size:1.18rem;margin-bottom:.65rem;color:#fff}
-    .card p{color:var(--muted);font-size:.94rem;margin-bottom:1.2rem}
-    .tag-list{display:flex;flex-wrap:wrap;gap:.45rem}
-    .tag{background:rgba(148,163,184,.08);border:1px solid var(--border);padding:.22rem .6rem;border-radius:6px;font-size:.74rem;font-family:'Fira Code',monospace;color:#cbd5e1}
-    .price-card{padding:2rem;display:flex;flex-direction:column;justify-content:space-between;transition:all .25s}
-    .price-card.featured{border-color:rgba(59,130,246,.55);background:linear-gradient(180deg,rgba(37,99,235,.12),rgba(17,24,39,.85));box-shadow:0 12px 32px rgba(37,99,235,.16)}
-    .price-tier{font-family:'Fira Code',monospace;font-size:.8rem;color:#93c5fd;text-transform:uppercase;letter-spacing:.06em}
-    .price-val{font-size:2.2rem;font-weight:800;margin:.4rem 0 .2rem;font-family:'Fira Code',monospace}
-    .price-sub{color:var(--muted);font-size:.86rem;margin-bottom:1.25rem}
-    .price-list{list-style:none;margin-bottom:1.6rem;font-size:.9rem;color:#cbd5e1}
-    .price-list li{margin-bottom:.5rem;padding-left:1.1rem;position:relative}
-    .price-list li::before{content:'✓';position:absolute;left:0;color:var(--accent2);font-weight:700}
-    .table-container{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;text-align:left;font-size:.92rem}
-    th,td{padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
-    th{background:rgba(255,255,255,.02);font-weight:600;color:#e2e8f0;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
-    td{color:var(--muted)} tr:last-child td{border-bottom:none}
-    .repo-link{color:#60a5fa;text-decoration:none;font-weight:600}
-    .repo-link:hover{text-decoration:underline}
-    .pill-ok{display:inline-block;padding:.22rem .65rem;border-radius:999px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.32);color:#34d399;font-family:'Fira Code',monospace;font-size:.78rem;font-weight:600}
-    footer{border-top:1px solid var(--border);padding:3rem 1.5rem;text-align:center;color:var(--muted);font-size:.9rem}
-    @media(max-width:860px){.stats,.grid-2,.grid-3{grid-template-columns:1fr}.nav-links a:not(.btn){display:none}}
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #050811;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    #bg3d {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .glass {
+      background: rgba(11, 17, 32, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+    }
+    .glass-hover:hover {
+      border-color: rgba(34, 211, 238, 0.55);
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
+    }
   </style>
 </head>
-<body>
-  <header>
-    <div class="nav-wrap">
-      <a href="#" class="logo"><svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><rect x="4" y="4" width="20" height="20" rx="4" stroke="#3b82f6" stroke-width="2" fill="rgba(59,130,246,0.12)"/><path d="M9 1v3M14 1v3M19 1v3M9 24v3M14 24v3M19 24v3M1 9h3M1 14h3M1 19h3M24 9h3M24 14h3M24 19h3" stroke="#10b981" stroke-width="1.6" stroke-linecap="round"/><path d="M9.5 18V10l5 8V10M17.5 10v8M21 10l-3.5 4 3.5 4" stroke="#f8fafc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>NK VERIF LABS</a>
-      <div class="nav-links">
-        <a href="#services">Services</a>
-        <a href="#portfolio">Silicon Proof</a>
-        <a href="https://www.linkedin.com/in/nk-veriflabs" target="_blank" class="btn">Connect on LinkedIn</a>
+<body class="relative min-h-screen text-slate-200">
+  <!-- Full-Page Interactive 3D Background -->
+  <canvas id="bg3d"></canvas>
+
+  <!-- Sticky Navigation -->
+  <nav class="sticky top-0 z-30 border-b border-slate-800/80 bg-[#050811]/85 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <a href="#top" class="flex items-center gap-2.5">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <rect x="4" y="4" width="28" height="28" rx="6" fill="#0f172a" stroke="#22d3ee" stroke-width="2" />
+          <path d="M10 24V12L17 22V12M21 12V24M21 18L26 12M21 18L26 24" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="font-bold text-sm sm:text-base tracking-tight text-white">NK Verif Labs</span>
+      </a>
+      <div class="flex items-center gap-4 text-xs sm:text-sm">
+        <a href="#services" class="text-slate-300 hover:text-cyan-300 transition hidden sm:inline">Services</a>
+        <a href="#proof" class="text-slate-300 hover:text-cyan-300 transition">Silicon Proof</a>
+        <a href="#toolchain" class="text-slate-300 hover:text-cyan-300 transition hidden sm:inline">Toolchain</a>
+        <a href="mailto:nkveriflabs@gmail.com" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold transition">
+          Contact
+        </a>
       </div>
     </div>
-  </header>
-  <main>
-    <section class="hero">
-      <div class="pill-row">
+  </nav>
+
+  <!-- Content Overlay -->
+  <div id="top" class="relative z-10 max-w-6xl mx-auto px-4 py-10 sm:py-16 space-y-16">
+    <!-- Hero Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-7 space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 text-xs mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Sky130 · IHP SG13G2 · Cocotb + Verilator/Icarus
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          Silicon-Proven <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">RTL-to-GDSII</span> &amp; Cocotb Verification
+        </h1>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
+          I'm <strong class="text-white">Niranjankumar Katragadda</strong>, Physical Design &amp; Principal Verification Engineer at <strong class="text-cyan-300">NK Verif Labs</strong>. I partner with RISC-V, AI accelerator, and open-silicon teams to ship clean GDSII tapeouts, dual-simulator Cocotb VIPs, and automated CI regressions.
+        </p>
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <a href="#proof" class="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-sm transition shadow-lg shadow-cyan-500/20">
+            Explore 7 Verified Repos ↓
+          </a>
+          <a href="https://niranjankumarkatragadda.github.io/noc-mesh-3d.html" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl glass glass-hover text-emerald-300 font-semibold text-sm transition">
+            Launch 3D NoC Visualizer ↗
+          </a>
+          <a href="https://github.com/NiranjankumarKatragadda" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-xl glass glass-hover text-slate-200 font-medium text-sm transition">
+            GitHub ↗
+          </a>
+        </div>
       </div>
-      <h1>Turnkey RTL-to-GDSII Hardening &amp; Cocotb Verification</h1>
-      <p>Physical implementation, multi-corner STA closure, 13/13 precheck sign-off, and portable Cocotb/Verilator testbenches for SkyWater 130nm, IHP SG13G2, and open MPW shuttles.</p>
-      <div class="cta-row">
-        <a href="mailto:nkveriflabs@gmail.com?subject=NK%20Verif%20Labs%20Tape-Out%20Audit" class="btn">Request Tape-Out Audit</a>
-        <a href="https://github.com/NiranjankumarKatragadda" target="_blank" class="btn btn-outline">Explore GitHub Repos ↗</a>
+
+      <!-- Interactive 3D Die Inspector Card -->
+      <div class="lg:col-span-5 glass rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-cyan-300 mono">Live 3D Silicon Scene</span>
+          <button id="btnToggleSpin" class="px-2.5 py-1 rounded-md text-xs mono bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">
+            Pause 3D
+          </button>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Move your cursor or scroll to shift the 3D interposer camera, or toggle the 3D core mode below to inspect RTL-to-GDSII vs. Verification layers.
+        </p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button id="btnModeWafer" class="py-2 px-3 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold cursor-pointer">
+            Silicon Die View
+          </button>
+          <button id="btnModeMesh" class="py-2 px-3 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700 hover:text-white font-medium cursor-pointer">
+            NoC Mesh View
+          </button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-center">
+          <div>
+            <div class="text-lg font-bold text-white mono">7</div>
+            <div class="text-[11px] text-slate-400">CI-Green Repos</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-emerald-400 mono">13/13</div>
+            <div class="text-[11px] text-slate-400">cf-precheck</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-cyan-400 mono">2×</div>
+            <div class="text-[11px] text-slate-400">Dual-Sim CI</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <div class="stats">
-      <div class="stat-card"><div class="stat-val">13 / 13</div><div class="stat-lbl">cf-precheck v1.3.7 PASS</div></div>
-      <div class="stat-card"><div class="stat-val">0</div><div class="stat-lbl">DRC / LVS Violations</div></div>
-      <div class="stat-card"><div class="stat-val">100 MHz</div><div class="stat-lbl">Timing Closure Met</div></div>
-      <div class="stat-card"><div class="stat-val">Sky130 &amp; IHP</div><div class="stat-lbl">Validated Open PDKs</div></div>
-    </div>
-
-    <section id="services" class="section">
-      <h2 class="section-title">Consulting &amp; Verification Services</h2>
-      <p class="section-desc">Zero-license overhead silicon engineering tailored for startups, researchers, and open-source hardware teams.</p>
-      <div class="grid-2">
-        <div class="card">
-          <h3>Macro Hardening &amp; Timing Closure</h3>
-          <p>Taking verified Verilog/SystemVerilog RTL to clean GDSII, LEF, and Liberty (.lib) models with balanced CTS and positive setup/hold slack.</p>
-          <div class="tag-list"><span class="tag">OpenLane</span><span class="tag">LibreLane</span><span class="tag">OpenROAD</span><span class="tag">OpenSTA</span></div>
+    <!-- 2x2 Services Grid -->
+    <section id="services" class="space-y-5">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white">Consulting Capabilities</h2>
+        <p class="text-xs sm:text-sm text-slate-400">Focused execution for fabless startups, C2S university teams, and open-source silicon.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="glass glass-hover rounded-2xl p-5 transition">
+          <div class="text-xs mono text-emerald-400 mb-1">01 · PHYSICAL VERIFICATION</div>
+          <h3 class="text-base font-bold text-white mb-2">Pre-Shuttle DRC, LVS &amp; Precheck Sign-Off</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Pin-mux/OEB padframe cleanup, KLayout DRC/LVS closure, antenna fixes, and full <span class="mono text-emerald-300">cf-precheck</span> readiness on SkyWater 130nm &amp; IHP SG13G2.
+          </p>
         </div>
-        <div class="card">
-          <h3>Pre-Shuttle Audit &amp; Sign-Off</h3>
-          <p>Multi-corner STA, Magic/KLayout DRC, CVC OEB checks, and Netgen LVS verification before your open MPW or Europractice shuttle cutoff.</p>
-          <div class="tag-list"><span class="tag">Multi-Corner STA</span><span class="tag">0 DRC</span><span class="tag">Clean LVS</span><span class="tag">CVC OEB</span></div>
+        <div class="glass glass-hover rounded-2xl p-5 transition">
+          <div class="text-xs mono text-cyan-400 mb-1">02 · RTL-TO-GDSII &amp; STA</div>
+          <h3 class="text-base font-bold text-white mb-2">OpenLane / LibreLane Hardening &amp; Timing</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Synthesis, floorplanning, CTS, routing, and multi-corner STA timing closure using LibreLane, OpenLane, OpenROAD, and Cadence Innovus/Genus/Tempus.
+          </p>
         </div>
-        <div class="card">
-          <h3>Cocotb &amp; Protocol Verification</h3>
-          <p>Portable Python/Cocotb testbenches and BFM wrappers for PCIe PIPE, SerDes, and SoC peripherals running cleanly on Verilator and Icarus Verilog.</p>
-          <div class="tag-list"><span class="tag">Cocotb</span><span class="tag">Verilator</span><span class="tag">cocotbext-pcie</span><span class="tag">Icarus</span></div>
+        <div class="glass glass-hover rounded-2xl p-5 transition">
+          <div class="text-xs mono text-emerald-400 mb-1">03 · COCOTB &amp; PROTOCOL VIPS</div>
+          <h3 class="text-base font-bold text-white mb-2">Python/Cocotb Testbenches &amp; Bus Monitors</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Reusable verification environments with <span class="mono text-cyan-300">cocotbext-axi</span>, <span class="mono text-cyan-300">cocotbext-pcie</span>, AXI4/AXI4-Stream, APB3, SerDes K28.5/PRBS, and Async CDC FIFOs.
+          </p>
         </div>
-        <div class="card">
-          <h3>Automated CI/CD ASIC Pipelines</h3>
-          <p>Turnkey GitHub Actions and Nix flows running RTL/gate-level Cocotb simulations, synthesis, and cf-precheck v1.3.7 on every push.</p>
-          <div class="tag-list"><span class="tag">GitHub Actions</span><span class="tag">Nix</span><span class="tag">cf-precheck v1.3.7</span></div>
+        <div class="glass glass-hover rounded-2xl p-5 transition">
+          <div class="text-xs mono text-cyan-400 mb-1">04 · AUTOMATED CI</div>
+          <h3 class="text-base font-bold text-white mb-2">Dual-Simulator GitHub Actions Regressions</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Portable Verilog-2001/SystemVerilog RTL and gate-level netlist simulations running automatically across Verilator and Icarus Verilog on every push.
+          </p>
         </div>
       </div>
     </section>
 
-    <section id="portfolio" class="section">
-      <h2 class="section-title">Verified Silicon Projects &amp; PPA</h2>
-      <p class="section-desc">Reproducible physical implementations and CI-verified flows across open PDKs.</p>
-      <div class="table-container">
-        <table>
-          <thead><tr><th>Design &amp; Macro</th><th>PDK / Technology</th><th>Toolchain Flow</th><th>Target Freq</th><th>Sign-Off Status</th></tr></thead>
-          <tbody>
-            <tr><td><a href="https://github.com/NiranjankumarKatragadda/riscv-rv32i-physical-design" target="_blank" class="repo-link">5-Stage RV32I Processor Core ↗</a></td><td>SkyWater 130nm (sky130A)</td><td>OpenLane / OpenROAD</td><td>100 MHz</td><td><span class="pill-ok">13/13 cf-precheck PASS</span></td></tr>
-            <tr><td><a href="https://github.com/NiranjankumarKatragadda/ihp-sg13g2-systolic-array" target="_blank" class="repo-link">4×4 Systolic Array MAC Accelerator ↗</a></td><td>IHP SG13G2 (130nm BiCMOS)</td><td>LibreLane v3.0.4</td><td>100 MHz (+5.1ns WNS)</td><td><span class="pill-ok">Green CI + Cocotb RTL/GL</span></td></tr>
-            <tr><td><a href="https://github.com/NiranjankumarKatragadda/ihp-sg13g2-axi4-dma" target="_blank" class="repo-link">AXI4 / AXI-Lite DMA (16-Beat INCR Burst) ↗</a></td><td>IHP SG13G2 (130nm BiCMOS)</td><td>LibreLane + cocotbext-axi</td><td>50 MHz</td><td><span class="pill-ok">Green CI + RTL/GL PASS</span></td></tr>
-            <tr><td><a href="https://github.com/NiranjankumarKatragadda/serdes-8b10b-prbs-cocotb-vip" target="_blank" class="repo-link">SerDes K28.5 + PRBS-7/31 VIP ↗</a></td><td>Generic / Open RTL</td><td>Cocotb + Verilator + Icarus</td><td>250 MHz</td><td><span class="pill-ok">Dual-Sim CI PASS</span></td></tr>
-            <tr><td><strong>3×3 Mesh NoC AI Accelerator</strong></td><td>SkyWater 130nm (sky130A)</td><td>OpenLane Flow</td><td>100 MHz</td><td><span class="pill-ok">Clean Sign-Off</span></td></tr>
-            <tr><td><a href="https://github.com/NiranjankumarKatragadda/vlsi-physical-design-project" target="_blank" class="repo-link">PicoRV32 SoC &amp; UART Peripheral ↗</a></td><td>SkyWater 130nm (sky130A)</td><td>OpenLane / Yosys</td><td>50 MHz</td><td><span class="pill-ok">GDSII Ready</span></td></tr>
-                      <tr><td><a href="https://github.com/NiranjankumarKatragadda/axis-skid-arbiter-cocotb-vip" target="_blank" class="repo-link">AXI4-Stream 2-to-1 Arbiter &amp; Skid Buffer VIP ↗</a></td><td>Protocol VIP (Verilog-2001)</td><td>Verilator + Icarus + cocotbext-axi</td><td>-</td><td><span class="pill-ok">Dual-Sim CI PASS</span></td></tr>
-                      <tr><td><a href="https://github.com/NiranjankumarKatragadda/async-cdc-fifo-cocotb-vip" target="_blank" class="repo-link">Async Gray-Code CDC FIFO VIP ↗</a></td><td>CDC IP (Verilog-2001)</td><td>Verilator + Icarus + Cocotb</td><td>100 / 71.4 MHz</td><td><span class="pill-ok">Dual-Sim CI PASS</span></td></tr>
-                      <tr><td><a href="https://github.com/NiranjankumarKatragadda/noc-mesh-4x4-cocotb-vip" target="_blank" class="repo-link">4x4 XY-Routing NoC Mesh VIP ↗</a> · <a href="noc-mesh-3d.html" target="_blank" class="repo-link">3D Live Demo ↗</a></td><td>NoC IP (Verilog-2001)</td><td>Verilator + Icarus + Cocotb</td><td>16 Tiles (48/48 Pkts)</td><td><span class="pill-ok">Dual-Sim CI PASS</span></td></tr>
-          </tbody>
-        </table>
+    <!-- Verified Silicon Projects Table -->
+    <section id="proof" class="space-y-4">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">Verified Silicon &amp; VIP Proof-of-Work</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Every repository below has reproducible public source and passing GitHub Actions CI.</p>
+        </div>
+      </div>
+      <div class="glass rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-900/70 text-slate-400 text-xs uppercase tracking-wider">
+                <th class="py-3 px-4">Project</th>
+                <th class="py-3 px-4">Target / PDK</th>
+                <th class="py-3 px-4">Stack</th>
+                <th class="py-3 px-4">Proof Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80">
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold"><a href="https://github.com/NiranjankumarKatragadda/riscv-rv32i-physical-design" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">5-Stage RV32I SoC ↗</a></td>
+                <td class="py-3 px-4 text-slate-300">SkyWater 130nm</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">OpenLane + cf-precheck</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mono">13/13 PASS</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold"><a href="https://github.com/NiranjankumarKatragadda/ihp-sg13g2-systolic-array" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">4×4 Systolic Array MAC ↗</a></td>
+                <td class="py-3 px-4 text-slate-300">IHP SG13G2 (130nm)</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">LibreLane + Cocotb</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mono">RTL/GL CI PASS</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold"><a href="https://github.com/NiranjankumarKatragadda/ihp-sg13g2-axi4-dma" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">AXI4 / AXI-Lite DMA (16-Beat INCR) ↗</a></td>
+                <td class="py-3 px-4 text-slate-300">IHP SG13G2 (130nm)</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">LibreLane + cocotbext-axi</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mono">RTL/GL CI PASS</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold"><a href="https://github.com/NiranjankumarKatragadda/serdes-8b10b-prbs-cocotb-vip" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">SerDes K28.5 + PRBS-7/31 VIP ↗</a></td>
+                <td class="py-3 px-4 text-slate-300">Protocol VIP</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">Verilator + Icarus + Cocotb</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 mono">Dual-Sim PASS</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold"><a href="https://github.com/NiranjankumarKatragadda/axis-skid-arbiter-cocotb-vip" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">AXI4-Stream 2-to-1 Arbiter &amp; Skid Buffer ↗</a></td>
+                <td class="py-3 px-4 text-slate-300">Protocol VIP</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">Verilator + Icarus + cocotbext-axi</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 mono">Dual-Sim PASS</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold"><a href="https://github.com/NiranjankumarKatragadda/async-cdc-fifo-cocotb-vip" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">Async Gray-Code CDC FIFO VIP ↗</a></td>
+                <td class="py-3 px-4 text-slate-300">CDC IP (100/71.4 MHz)</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">Verilator + Icarus + Cocotb</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 mono">Dual-Sim PASS</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-3 px-4 font-semibold">
+                  <a href="https://github.com/NiranjankumarKatragadda/noc-mesh-4x4-cocotb-vip" target="_blank" rel="noopener noreferrer" class="text-cyan-300 hover:underline">4×4 XY-Routing NoC Mesh VIP ↗</a>
+                  <a href="https://niranjankumarkatragadda.github.io/noc-mesh-3d.html" target="_blank" rel="noopener noreferrer" class="ml-2 text-xs text-emerald-300 hover:underline mono">[3D Demo ↗]</a>
+                </td>
+                <td class="py-3 px-4 text-slate-300">16-Tile NoC</td>
+                <td class="py-3 px-4 text-slate-400 mono text-xs">Verilator + Icarus + Cocotb</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 mono">Dual-Sim PASS</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
-  </main>
-  <footer>
-    <p><strong>NK Verif Labs</strong> &bull; Physical Design &amp; Functional Verification Consulting</p>
-    <p style="margin-top:.5rem">Lead Consultant: <strong>Niranjankumar Katragadda</strong> &bull; <a href="mailto:nkveriflabs@gmail.com" class="repo-link">nkveriflabs@gmail.com</a> &bull; <a href="https://www.linkedin.com/in/nk-veriflabs" target="_blank" class="repo-link">LinkedIn</a></p>
-  </footer>
+
+    <!-- Toolchain & Contact Footer -->
+    <footer id="toolchain" class="glass rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="text-sm font-bold text-white">NK Verif Labs · Direct Consulting Inquiries</div>
+        <div class="text-xs text-slate-400">SystemVerilog · Cocotb · Verilator · Icarus · LibreLane · OpenLane · Cadence Innovus / Genus / Tempus</div>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 text-xs font-semibold">
+        <a href="mailto:nkveriflabs@gmail.com" class="px-3.5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">
+          nkveriflabs@gmail.com
+        </a>
+        <a href="https://github.com/NiranjankumarKatragadda" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          GitHub
+        </a>
+        <a href="https://www.linkedin.com/in/niranjankumar-katragadda-39317a233" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          LinkedIn
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("bg3d");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050811, 0.035);
+
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 4.5, 11);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      scene.add(new THREE.AmbientLight(0x94a3b8, 0.7));
+      const dir = new THREE.DirectionalLight(0x22d3ee, 1.1);
+      dir.position.set(8, 12, 10);
+      scene.add(dir);
+
+      // Silicon Grid Floor
+      const grid = new THREE.GridHelper(32, 32, 0x1e3a5f, 0x0f172a);
+      grid.position.y = -2.2;
+      scene.add(grid);
+
+      // Group 1: Silicon Die Core
+      const waferGroup = new THREE.Group();
+      const coreBox = new THREE.Mesh(
+        new THREE.BoxGeometry(3.4, 0.45, 3.4),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x064e3b, emissiveIntensity: 0.65, metalness: 0.7, roughness: 0.25 })
+      );
+      waferGroup.add(coreBox);
+      const coreWire = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.BoxGeometry(3.55, 0.55, 3.55)),
+        new THREE.LineBasicMaterial({ color: 0x34d399 })
+      );
+      waferGroup.add(coreWire);
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(2.9, 0.04, 12, 64),
+        new THREE.MeshBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.6 })
+      );
+      ring.rotation.x = Math.PI / 2;
+      waferGroup.add(ring);
+      waferGroup.position.set(3.2, 0.4, -1.5);
+      scene.add(waferGroup);
+
+      // Group 2: 3D NoC Mesh Mode
+      const meshGroup = new THREE.Group();
+      const tileGeo = new THREE.BoxGeometry(0.65, 0.25, 0.65);
+      const tileMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0e7490, emissiveIntensity: 0.6 });
+      for (let x = 0; x < 4; x++) {
+        for (let z = 0; z < 4; z++) {
+          const tile = new THREE.Mesh(tileGeo, tileMat);
+          tile.position.set((x - 1.5) * 1.1, 0, (z - 1.5) * 1.1);
+          meshGroup.add(tile);
+        }
+      }
+      meshGroup.position.set(3.2, 0.4, -1.5);
+      meshGroup.visible = false;
+      scene.add(meshGroup);
+
+      // Floating Data Particles
+      const pCount = 120;
+      const pGeo = new THREE.BufferGeometry();
+      const pPos = new Float32Array(pCount * 3);
+      for (let i = 0; i < pCount; i++) {
+        pPos[i * 3] = (Math.random() - 0.5) * 24;
+        pPos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+        pPos[i * 3 + 2] = (Math.random() - 0.5) * 16 - 2;
+      }
+      pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+      const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.07, transparent: true, opacity: 0.7 }));
+      scene.add(particles);
+
+      let spinning = true;
+      let mouseX = 0, mouseY = 0;
+
+      window.addEventListener("pointermove", (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      document.getElementById("btnToggleSpin").addEventListener("click", () => {
+        spinning = !spinning;
+        document.getElementById("btnToggleSpin").textContent = spinning ? "Pause 3D" : "Resume 3D";
+      });
+
+      const btnW = document.getElementById("btnModeWafer");
+      const btnM = document.getElementById("btnModeMesh");
+      btnW.addEventListener("click", () => {
+        waferGroup.visible = true;
+        meshGroup.visible = false;
+        btnW.className = "py-2 px-3 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold cursor-pointer";
+        btnM.className = "py-2 px-3 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700 hover:text-white font-medium cursor-pointer";
+      });
+      btnM.addEventListener("click", () => {
+        waferGroup.visible = false;
+        meshGroup.visible = true;
+        btnM.className = "py-2 px-3 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold cursor-pointer";
+        btnW.className = "py-2 px-3 rounded-lg bg-slate-800/80 text-slate-300 border border-slate-700 hover:text-white font-medium cursor-pointer";
+      });
+
+      let last = performance.now();
+      function animate(now) {
+        requestAnimationFrame(animate);
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+
+        const scrollY = window.scrollY || 0;
+        camera.position.x += (mouseX * 1.4 - camera.position.x) * 0.05;
+        camera.position.y += (4.5 - mouseY * 0.8 - scrollY * 0.003 - camera.position.y) * 0.05;
+        camera.lookAt(0, 0, -1);
+
+        if (spinning) {
+          waferGroup.rotation.y += dt * 0.45;
+          meshGroup.rotation.y += dt * 0.35;
+          particles.rotation.y += dt * 0.04;
+        }
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(animate);
+    })();
+  </script>
 </body>
 </html>

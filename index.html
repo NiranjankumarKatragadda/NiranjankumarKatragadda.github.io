@@ -278,6 +278,27 @@
     </footer>
   </div>
 
+  <div id="nkChatWrap" class="fixed bottom-5 right-5 z-40">
+    <div id="nkChatBox" class="hidden mb-3 w-80 sm:w-96 glass rounded-2xl shadow-2xl overflow-hidden border border-cyan-500/40">
+      <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-xs font-bold text-white mono">NK Verif Support</span></div>
+        <button id="nkChatClose" class="text-slate-400 hover:text-white text-sm cursor-pointer">✕</button>
+      </div>
+      <div id="nkChatLog" class="p-3.5 space-y-2.5 max-h-64 overflow-y-auto text-xs leading-relaxed">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 text-slate-200">Hi! Ask about <b>Cocotb/Verilator VIPs</b>, <b>Sky130 / IHP SG13G2</b> flows, <b>cf-precheck</b>, or <b>scoping</b>.</div>
+      </div>
+      <div class="px-3 pb-2 flex flex-wrap gap-1.5 text-[11px]">
+        <button class="nkChip px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-cyan-300 cursor-pointer" data-q="Cocotb VIPs">Cocotb VIPs</button>
+        <button class="nkChip px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-emerald-300 cursor-pointer" data-q="Sky130 / IHP PD">Sky130 / IHP PD</button>
+        <button class="nkChip px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-cyan-300 cursor-pointer" data-q="Pricing & Scope">Pricing &amp; Scope</button>
+      </div>
+      <form id="nkChatForm" class="p-2.5 border-t border-slate-800 flex gap-2">
+        <input id="nkChatIn" placeholder="Ask about RTL, PDK, or CI..." class="flex-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-400" />
+        <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold cursor-pointer">Send</button>
+      </form>
+    </div>
+    <button id="nkChatToggle" class="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 cursor-pointer">💬 Ask NK Verif Labs</button>
+  </div>
   <script>
     (function () {
       const canvas = document.getElementById("bg3d");
@@ -412,6 +433,23 @@
         renderer.render(scene, camera);
       }
       requestAnimationFrame(animate);
+      const box = document.getElementById("nkChatBox"), log = document.getElementById("nkChatLog");
+      document.getElementById("nkChatToggle").onclick = () => box.classList.toggle("hidden");
+      document.getElementById("nkChatClose").onclick = () => box.classList.add("hidden");
+      function addMsg(txt, me) {
+        const d = document.createElement("div");
+        d.className = me ? "ml-8 bg-cyan-500/20 border border-cyan-500/40 rounded-xl p-2.5 text-cyan-100" : "mr-4 bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 text-slate-200";
+        d.innerHTML = txt; log.appendChild(d); log.scrollTop = log.scrollHeight;
+      }
+      function reply(q) {
+        const t = q.toLowerCase();
+        if (/cocotb|vip|verilator|icarus|axi|serdes|noc|cdc/.test(t)) return 'We build dual-sim (Verilator + Icarus) Cocotb VIPs: 4x4 NoC Mesh, Async CDC FIFO, AXI4-Stream Arbiter, 8b/10b SerDes, and 16-beat AXI4 DMA. <a href="#proof" class="text-cyan-300 underline">See 7 CI-green repos ↑</a>';
+        if (/sky130|ihp|sg13g2|librelane|openlane|precheck|drc|lvs|pd|sta/.test(t)) return 'We close RTL-to-GDSII on Sky130 (13/13 cf-precheck PASS) & IHP SG13G2 via LibreLane/OpenROAD/STA. <a href="#templates" class="text-emerald-300 underline">Try our PDK templates ↑</a>';
+        if (/price|cost|quote|hire|scope|time|contact|email/.test(t)) return 'We work on fixed-scope milestones or hourly retainers with 24h replies. <a href="#scope" class="text-emerald-300 underline">Jump to Scoping Brief ↓</a> or email <b>nkveriflabs@gmail.com</b>.';
+        return 'Happy to help! You can explore our <a href="#proof" class="text-cyan-300 underline">Verified Repos</a>, <a href="#templates" class="text-cyan-300 underline">MIT Templates</a>, or <a href="#scope" class="text-emerald-300 underline">Submit a Scoping Brief ↓</a>.';
+      }
+      document.querySelectorAll(".nkChip").forEach(b => b.onclick = () => { addMsg(b.dataset.q, true); addMsg(reply(b.dataset.q), false); });
+      document.getElementById("nkChatForm").onsubmit = (e) => { e.preventDefault(); const v = nkChatIn.value.trim(); if (!v) return; addMsg(v, true); nkChatIn.value = ""; addMsg(reply(v), false); };
     })();
   </script>
 </body>

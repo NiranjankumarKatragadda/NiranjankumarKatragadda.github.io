@@ -456,6 +456,7 @@
       function reply(q) {
         const t = q.toLowerCase();
         if (/cocotb|vip|verilator|icarus|axi|serdes|noc|cdc/.test(t)) return 'We build dual-sim (Verilator + Icarus) Cocotb VIPs: 4x4 NoC Mesh, Async CDC FIFO, AXI4-Stream Arbiter, 8b/10b SerDes, and 16-beat AXI4 DMA. <a href="#proof" class="text-cyan-300 underline">See 7 CI-green repos ↑</a>';
+        if (/asap7|gf180|6g|ldpc|baseband|7nm/.test(t)) return 'We closed a <b>1.203 GHz 6G LDPC Decoder</b> on ASAP7 7nm (ORFS, LEC PASS) and a <b>6.4 Gbps 6G Baseband TX</b> on GF180MCU (LibreLane, 0 DRC, clean LVS). <a href="#proof" class="text-cyan-300 underline">See Verified Repos ↑</a>';
         if (/sky130|ihp|sg13g2|librelane|openlane|precheck|drc|lvs|pd|sta/.test(t)) return 'We close RTL-to-GDSII on Sky130 (13/13 cf-precheck PASS) & IHP SG13G2 via LibreLane/OpenROAD/STA. <a href="#templates" class="text-emerald-300 underline">Try our PDK templates ↑</a>';
         if (/price|cost|quote|hire|scope|time|contact|email/.test(t)) return 'We work on fixed-scope milestones or hourly retainers with 24h replies. <a href="#scope" class="text-emerald-300 underline">Jump to Scoping Brief ↓</a> or email <b>nkveriflabs@gmail.com</b>.';
         return 'Happy to help! You can explore our <a href="#proof" class="text-cyan-300 underline">Verified Repos</a>, <a href="#templates" class="text-cyan-300 underline">MIT Templates</a>, or <a href="#scope" class="text-emerald-300 underline">Submit a Scoping Brief ↓</a>.';
